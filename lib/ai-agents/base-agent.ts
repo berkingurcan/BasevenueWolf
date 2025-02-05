@@ -6,6 +6,7 @@ import {
   erc20ActionProvider,
 } from "@coinbase/agentkit";
 
+import { tokenManagerActionProvider } from "./tokenManagerProvider";
 import { getLangChainTools } from "@coinbase/agentkit-langchain";
 import { HumanMessage } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
@@ -33,6 +34,7 @@ async function initAgent() {
         wethActionProvider(),
         walletActionProvider(),
         erc20ActionProvider(),
+        tokenManagerActionProvider(),
       ],
     });
 
@@ -54,18 +56,21 @@ async function main() {
   const result = await initAgent();
   if (!result) return;
   const { agent, config } = result;
-  
+
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
-  const userInput = await new Promise<string>(resolve => {
-    rl.question('Enter your message: ', resolve);
+  const userInput = await new Promise<string>((resolve) => {
+    rl.question("Enter your message: ", resolve);
   });
   rl.close();
 
-  const stream = await agent.stream({ messages: [new HumanMessage(userInput)] }, config);
+  const stream = await agent.stream(
+    { messages: [new HumanMessage(userInput)] },
+    config,
+  );
   for await (const chunk of stream) {
     if ("agent" in chunk) {
       console.log(chunk.agent.messages[0].content);
