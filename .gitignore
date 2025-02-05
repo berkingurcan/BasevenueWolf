@@ -28,7 +28,11 @@ yarn-error.log*
 # local env files
 .env*.local
 
+# local env files
+.env
+
 cdp_api_key.json
+coinbase_cloud_api_key.json
 
 # vercel
 .vercel
