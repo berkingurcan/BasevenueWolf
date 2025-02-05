@@ -7,6 +7,7 @@ import {
 } from "@coinbase/agentkit";
 
 import { tokenManagerActionProvider } from "./tokenManagerProvider";
+import { productManagerProvider } from "./productManagerProvider";
 import { getLangChainTools } from "@coinbase/agentkit-langchain";
 import { HumanMessage } from "@langchain/core/messages";
 import { MemorySaver } from "@langchain/langgraph";
@@ -35,6 +36,7 @@ async function initAgent() {
         walletActionProvider(),
         erc20ActionProvider(),
         tokenManagerActionProvider(),
+        productManagerProvider(),
       ],
     });
 
@@ -84,6 +86,5 @@ async function main() {
 main();
 
 export { initAgent };
-
 
 // NODE_OPTIONS='--loader ts-node/esm' node --experimental-specifier-resolution=node lib/ai-agents/base-agent.ts
