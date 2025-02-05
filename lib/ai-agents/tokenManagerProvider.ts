@@ -8,11 +8,14 @@ import {
 import { encodeFunctionData } from "viem";
 
 // Schema for mint action
-const MintSchema = z.object({
-  contractAddress: z.string().describe("The ERC20 token contract address"),
-  recipient: z.string().describe("The address to receive the minted tokens"),
-  amount: z.string().describe("The amount of tokens to mint"),
-});
+const MintSchema = z
+  .object({
+    contractAddress: z.string().describe("The ERC20 token contract address"),
+    recipient: z.string().describe("The address to receive the minted tokens"),
+    amount: z.string().describe("The amount of tokens to mint"),
+  })
+  .strip()
+  .describe("The parameters for the mint action");
 
 /**
  * TokenManagerActionProvider handles ERC20 token management operations like minting
@@ -44,7 +47,7 @@ export class TokenManagerActionProvider extends ActionProvider {
   })
   async mint(
     walletProvider: EvmWalletProvider,
-    args: z.infer<typeof MintSchema>
+    args: z.infer<typeof MintSchema>,
   ): Promise<string> {
     try {
       // ERC20 mint function ABI
