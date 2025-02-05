@@ -24,6 +24,9 @@ export class TokenManagerActionProvider extends ActionProvider {
 
   /**
    * Mints ERC20 tokens to a specified address
+   * @param walletProvider - The wallet provider to mint the tokens from
+   * @param args - The parameters for the mint action
+   * @returns A message containing the mint details
    */
   @CreateAction({
     name: "mint_tokens",
@@ -40,13 +43,9 @@ export class TokenManagerActionProvider extends ActionProvider {
     schema: MintSchema,
   })
   async mint(
-    args: z.infer<typeof MintSchema>,
-    walletProvider?: EvmWalletProvider,
+    walletProvider: EvmWalletProvider,
+    args: z.infer<typeof MintSchema>
   ): Promise<string> {
-    if (!walletProvider) {
-      throw new Error("Wallet provider is required for minting tokens");
-    }
-
     try {
       // ERC20 mint function ABI
       const mintAbi = [
