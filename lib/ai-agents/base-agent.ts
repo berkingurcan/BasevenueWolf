@@ -12,15 +12,18 @@ import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 
-import * as dotenv from "dotenv";
 import * as fs from "fs";
 import * as readline from "readline";
 import { config } from "./config";
+import dotenv from "dotenv";
+
+dotenv.config({ path: `.env.local`, override: true });
 
 async function initAgent() {
   try {
     const llm = new ChatOpenAI({
       model: "gpt-4o-mini",
+      openAIApiKey: process.env.OPENAI_API_KEY,
     });
 
     const walletProvider = await CdpWalletProvider.configureWithWallet(config);
