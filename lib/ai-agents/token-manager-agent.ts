@@ -1,10 +1,10 @@
-import { BaseAgent } from './base-agent';
-import { AgentConfig } from './types';
+import { BaseAgent } from "./base-agent";
+import { AgentConfig } from "./types";
 
 export class TokenManagerAgent extends BaseAgent {
   constructor() {
     const config: AgentConfig = {
-      role: 'TOKEN_MANAGER',
+      role: "TOKEN_MANAGER",
       systemPrompt: `You are a Token Management AI Agent responsible for:
 - Managing main token economics
 - Handling minting operations
@@ -13,19 +13,19 @@ export class TokenManagerAgent extends BaseAgent {
       tools: [
         // TODO: Implement these tools
         {
-          name: 'mint',
-          description: 'Mint new tokens',
+          name: "mint",
+          description: "Mint new tokens",
           parameters: {
-            type: 'object',
+            type: "object",
             properties: {
-              amount: { type: 'string' },
-              recipient: { type: 'string' },
+              amount: { type: "string" },
+              recipient: { type: "string" },
             },
-            required: ['amount', 'recipient'],
+            required: ["amount", "recipient"],
           },
           handler: async (params) => {
             // TODO: Implement minting logic
-            throw new Error('Not implemented');
+            throw new Error("Not implemented");
           },
         },
         // Add more token management tools
@@ -33,4 +33,4 @@ export class TokenManagerAgent extends BaseAgent {
     };
     super(config);
   }
-} 
+}

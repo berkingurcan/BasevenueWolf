@@ -62,7 +62,7 @@ export default function Home() {
       if (files.length > 0) {
         const validFiles = files.filter(
           (file) =>
-            file.type.startsWith("image/") || file.type.startsWith("text/")
+            file.type.startsWith("image/") || file.type.startsWith("text/"),
         );
 
         if (validFiles.length === files.length) {
@@ -93,7 +93,7 @@ export default function Home() {
     if (droppedFilesArray.length > 0) {
       const validFiles = droppedFilesArray.filter(
         (file) =>
-          file.type.startsWith("image/") || file.type.startsWith("text/")
+          file.type.startsWith("image/") || file.type.startsWith("text/"),
       );
 
       if (validFiles.length === droppedFilesArray.length) {
@@ -130,7 +130,7 @@ export default function Home() {
     if (selectedFiles) {
       const validFiles = Array.from(selectedFiles).filter(
         (file) =>
-          file.type.startsWith("image/") || file.type.startsWith("text/")
+          file.type.startsWith("image/") || file.type.startsWith("text/"),
       );
 
       if (validFiles.length === selectedFiles.length) {
@@ -199,7 +199,7 @@ export default function Home() {
                         <div className="text-xs w-40 h-24 overflow-hidden text-zinc-400 border p-2 rounded-md dark:bg-zinc-800 dark:border-zinc-700 mb-3">
                           {getTextFromDataUrl(attachment.url)}
                         </div>
-                      ) : null
+                      ) : null,
                     )}
                   </div>
                 </div>
@@ -293,7 +293,7 @@ export default function Home() {
                     >
                       <TextFilePreview file={file} />
                     </motion.div>
-                  ) : null
+                  ) : null,
                 )}
               </div>
             )}

@@ -1,9 +1,9 @@
-import { ChatCompletionMessage } from 'openai/resources/chat';
+import { ChatCompletionMessage } from "openai/resources/chat/completions";
+import { tool } from "ai";
 
-export type AgentRole = 'WALLET_MANAGER' | 'TOKEN_MANAGER' | 'PRODUCT_MANAGER';
+export type AgentRole = "WALLET_MANAGER" | "TOKEN_MANAGER" | "PRODUCT_MANAGER";
 
 export interface AgentConfig {
-  role: AgentRole;
   systemPrompt: string;
   tools: AgentTool[];
 }
@@ -12,7 +12,7 @@ export interface AgentTool {
   name: string;
   description: string;
   parameters: {
-    type: 'object';
+    type: "object";
     properties: Record<string, any>;
     required: string[];
   };
@@ -22,4 +22,4 @@ export interface AgentTool {
 export interface AgentContext {
   messages: ChatCompletionMessage[];
   tools?: AgentTool[];
-} 
+}
