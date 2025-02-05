@@ -2,7 +2,6 @@ export const AI_CONFIG = {
   model: "gpt-4o-mini", // or your preferred model
   temperature: 0.2,
   maxTokens: 4096,
-  // Add other OpenAI configuration options as needed
 };
 
 export const config = {
