@@ -7,18 +7,18 @@ import {
 } from "@coinbase/agentkit";
 import { encodeFunctionData } from "viem";
 
-// Schema for ERC20 game currency creation
-const GameCurrencySchema = z
+// Schema for ERC20 game product creation
+const GameProductSchema = z
   .object({
-    name: z.string().describe("Name of the game currency"),
-    symbol: z.string().describe("Symbol for the currency token"),
-    description: z.string().describe("Description of the game currency"),
+    name: z.string().describe("Name of the game product"),
+    symbol: z.string().describe("Symbol for the product token"),
+    description: z.string().describe("Description of the game product"),
     contractAddress: z.string().describe("The ERC20 token contract address"),
     recipient: z.string().describe("The address to receive the minted tokens"),
     amount: z.string().describe("The amount of tokens to mint"),
   })
   .strip()
-  .describe("The parameters for creating a game currency token (ERC20)");
+  .describe("The parameters for creating a game product token (ERC20)");
 
 // Schema for ERC721 game item creation
 const GameItemSchema = z
@@ -42,12 +42,12 @@ export class ProductManagerProvider extends ActionProvider {
   }
 
   /**
-   * Creates and mints game currency using ERC20 tokens
+   * Creates and mints game product using ERC20 tokens
    */
   @CreateAction({
-    name: "create_game_currency",
+    name: "create_game_product",
     description: `
-    This tool will create and mint game currency using ERC20 tokens.
+    This tool will create and mint game product using ERC20 tokens.
     
     Suitable for:
     - In-game currencies (coins, gems)
@@ -56,18 +56,18 @@ export class ProductManagerProvider extends ActionProvider {
     - Any fungible game resource
     
     Required inputs:
-    - name: Currency name (e.g., "Game Coins", "Energy Crystals")
+    - name: product name (e.g., "Game Coins", "Energy Crystals")
     - symbol: Token symbol (e.g., "GCOIN", "ENRG")
-    - description: Currency description
+    - description: product description
     - contractAddress: The deployed ERC20 contract address
-    - recipient: Address to receive the minted currency
-    - amount: Amount of currency tokens to mint
+    - recipient: Address to receive the minted product
+    - amount: Amount of product tokens to mint
     `,
-    schema: GameCurrencySchema,
+    schema: GameProductSchema,
   })
-  async createGameCurrency(
+  async createGameproduct(
     walletProvider: EvmWalletProvider,
-    args: z.infer<typeof GameCurrencySchema>,
+    args: z.infer<typeof GameProductSchema>,
   ): Promise<string> {
     try {
       // ERC20 mint function ABI
@@ -97,7 +97,7 @@ export class ProductManagerProvider extends ActionProvider {
 
       return `Successfully created and minted ${args.amount} ${args.name} (${args.symbol}) tokens to ${args.recipient}.\nTransaction hash: ${hash}`;
     } catch (error) {
-      return `Error creating game currency: ${error}`;
+      return `Error creating game product: ${error}`;
     }
   }
 
