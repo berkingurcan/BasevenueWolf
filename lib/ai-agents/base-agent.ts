@@ -84,7 +84,7 @@ async function main() {
   }
 }
 
-main();
+// main();
 
 export { initAgent };
 
