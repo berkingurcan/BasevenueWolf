@@ -50,6 +50,7 @@ npm run format
 ```
 
 **Response:**
+
 As [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream), the response will be streamed to the client.
 
 ```json
