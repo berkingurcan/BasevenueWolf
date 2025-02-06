@@ -1,39 +1,58 @@
-# Vercel AI SDK useChat with Attachments Example
+# BASEVENUEWOLF
 
-This example demonstrates how to use the [Vercel AI SDK](https://sdk.vercel.ai/docs) with [Next.js](https://nextjs.org/) with the `useChat` hook to create a chat interface that can send and receive multi-modal messages from the AI provider of your choice.
+`ETH Global Agentic 2025`
 
-## Deploy your own
+🚀 BasevenueWolf is the blockchain and AI-powered alternative to RevenueCat, bringing seamless, transparent, and trustless product management and revenue analytics to Web3 Applications.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel-labs%2Fai-sdk-preview-attachments&env=OPENAI_API_KEY&envDescription=API%20keys%20needed%20for%20application&envLink=platform.openai.com)
+## Features
 
-## How to use
+- 🤖 AI-powered Game Currency and Game products management
+- 💰 Revenue analytics and tracking(TODO)
+- ⛓️ Cross-chain bridging support(TODO)
+- 📊 Real-time analytics dashboard(TODO)
 
-Run [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
-
-```bash
-npx create-next-app --example https://github.com/vercel-labs/ai-sdk-preview-attachments ai-sdk-preview-attachments-example
-```
-
-```bash
-yarn create next-app --example https://github.com/vercel-labs/ai-sdk-preview-attachments ai-sdk-preview-attachments-example
-```
+## Installation
 
 ```bash
-pnpm create next-app --example https://github.com/vercel-labs/ai-sdk-preview-attachments ai-sdk-preview-attachments-example
+npm install
 ```
 
-To run the example locally you need to:
+## How to run
 
-1. Sign up for accounts with the AI providers you want to use (e.g., OpenAI, Anthropic).
-2. Obtain API keys for each provider.
-3. Set the required environment variables as shown in the `.env.example` file, but in a new file called `.env`.
-4. `npm install` to install the required dependencies.
-5. `npm run dev` to launch the development server.
+```bash
+npm run dev
+```
 
-## Learn More
+### Prettier
 
-To learn more about Vercel AI SDK or Next.js take a look at the following resources:
+```bash
+npm run format
+```
 
-- [Vercel AI SDK docs](https://sdk.vercel.ai/docs)
-- [Vercel AI Playground](https://play.vercel.ai)
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+## API Documentation
+
+### Chat
+
+**Endpoint:**
+`POST /api/chat`
+
+**Request:**
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Which tools do you have"
+    }
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "content": "I have the following tools: ..."
+}
+```

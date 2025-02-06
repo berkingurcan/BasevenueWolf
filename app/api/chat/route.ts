@@ -26,13 +26,11 @@ export async function POST(req: Request) {
             if ("agent" in chunk) {
               content = chunk.agent.messages[0].content;
             } else if ("tools" in chunk) {
-              content = chunk.tools.messages[0].content; 
+              content = chunk.tools.messages[0].content;
             }
-            
+
             if (content) {
-              controller.enqueue(
-                `data: ${JSON.stringify({ content })}\n\n`
-              );
+              controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
             }
           }
           controller.close();
@@ -40,12 +38,13 @@ export async function POST(req: Request) {
           controller.error(error);
         }
       },
-    }), {
+    }),
+    {
       headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
-    }
+    },
   );
 }
