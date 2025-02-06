@@ -175,3 +175,29 @@ async function fetchWalletAndLoadSeed(walletId: any, seedFilePath: any) {
     );
   }
 }
+
+async function main() {
+  try {
+    const { BASE_WALLET_ID, ARBITRUM_WALLET_ID, SEED_FILE_PATH } = process.env;
+
+    Coinbase.configureFromJson({
+      filePath: `${os.homedir()}/Downloads/cdp_api_key.json`,
+    });
+
+    const baseWallet = await fetchWalletAndLoadSeed(
+      BASE_WALLET_ID,
+      SEED_FILE_PATH,
+    );
+    const arbitrumWallet = await fetchWalletAndLoadSeed(
+      ARBITRUM_WALLET_ID,
+      SEED_FILE_PATH,
+    );
+
+    await bridgeUSDC(baseWallet, arbitrumWallet, 1);
+    console.log("Bridge USDC completed");
+  } catch (error) {
+    console.error(`Error in bridging USDC: `, error);
+  }
+}
+
+main();
