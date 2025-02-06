@@ -8,7 +8,6 @@ import {
 
 import { tokenManagerActionProvider } from "./tokenManagerProvider";
 import { productManagerProvider } from "./productManagerProvider";
-import { bridgeActionProvider } from "./bridgeProvider";
 
 import { getLangChainTools } from "@coinbase/agentkit-langchain";
 import { HumanMessage } from "@langchain/core/messages";
@@ -39,7 +38,6 @@ async function initAgent() {
         erc20ActionProvider(),
         tokenManagerActionProvider(),
         productManagerProvider(),
-        bridgeActionProvider(),
       ],
     });
 

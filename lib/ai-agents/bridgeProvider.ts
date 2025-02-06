@@ -51,7 +51,7 @@ export class BridgeActionProvider extends ActionProvider {
     args: z.infer<typeof BridgeSchema>,
   ): Promise<string> {
     try {
-      // Configure Coinbase SDK
+      // Configure Coinbase SDK file path in the root directory
       Coinbase.configureFromJson({
         filePath: `../cdp_api_key.json`,
       });
