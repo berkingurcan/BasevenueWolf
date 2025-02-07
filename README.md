@@ -30,6 +30,20 @@ npm run format
 ```
 
 ## API Documentation
+### Health Check API
+
+**Endpoint**: `GET /api/health`
+
+Check the health status of the application.
+
+#### Response
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2025-02-07T12:00:00Z"
+}
+```
 
 ### Chat
 
