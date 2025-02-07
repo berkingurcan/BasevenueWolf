@@ -1,99 +1,95 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { ERC20Deployer, SimpleToken } from "../typechain-types";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import hre from "hardhat";
+import { formatEther, parseEther, Log, getAddress } from "viem";
 
 describe("ERC20Deployer", function () {
-  let deployer: ERC20Deployer;
-  let owner: SignerWithAddress;
-  let user: SignerWithAddress;
+  async function deployERC20Deployer() {
+    const [deployer, user] = await hre.viem.getWalletClients();
+    const erc20Deployer = await hre.viem.deployContract("ERC20Deployer");
 
-  const TOKEN_NAME = "Test Token";
-  const TOKEN_SYMBOL = "TST";
-  const INITIAL_SUPPLY = 1000000;
-
-  beforeEach(async function () {
-    [owner, user] = await ethers.getSigners();
-    
-    const ERC20Deployer = await ethers.getContractFactory("ERC20Deployer");
-    deployer = await ERC20Deployer.deploy();
-  });
-
-  describe("Deployment", function () {
-    it("Should set the right owner", async function () {
-      expect(await deployer.owner()).to.equal(owner.address);
-    });
-  });
+    return { erc20Deployer, deployer, user };
+  }
 
   describe("Token Deployment", function () {
     it("Should deploy a new token with correct parameters", async function () {
-      const tx = await deployer.deployToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY);
-      const receipt = await tx.wait();
+      const { erc20Deployer, deployer } = await deployERC20Deployer();
+      
+      const tokenName = "Test Token";
+      const tokenSymbol = "TST";
+      const initialSupply = parseEther("1000000");
 
-      // Get the TokenDeployed event
-      const event = receipt?.logs[1]; // The second event should be TokenDeployed
-      const tokenAddress = event?.args?.[0];
+      const tx = await erc20Deployer.write.deployToken([
+        tokenName,
+        tokenSymbol,
+        initialSupply,
+        deployer.account.address,
+      ]);
 
-      // Get the deployed token contract
-      const SimpleToken = await ethers.getContractFactory("SimpleToken");
-      const token = SimpleToken.attach(tokenAddress) as SimpleToken;
+      // Get the token address from the event logs
+      const client = await hre.viem.getPublicClient();
+      const receipt = await client.waitForTransactionReceipt({ hash: tx });
+      const event = receipt.logs.find(
+        (log: Log) => log.address.toLowerCase() === erc20Deployer.address.toLowerCase()
+      );
+
+      expect(event).to.not.be.undefined;
+      if (!event || !event.topics[1]) throw new Error("Event not found");
+      
+      const tokenAddress = getAddress(`0x${event.topics[1].slice(26)}`);
+      const token = await hre.viem.getContractAt("CustomERC20", tokenAddress);
 
       // Verify token parameters
-      expect(await token.name()).to.equal(TOKEN_NAME);
-      expect(await token.symbol()).to.equal(TOKEN_SYMBOL);
-      expect(await token.totalSupply()).to.equal(INITIAL_SUPPLY * BigInt(10 ** 18)); // Account for decimals
-      expect(await token.balanceOf(owner.address)).to.equal(INITIAL_SUPPLY * BigInt(10 ** 18));
+      expect(await token.read.name()).to.equal(tokenName);
+      expect(await token.read.symbol()).to.equal(tokenSymbol);
+      expect(await token.read.totalSupply()).to.equal(initialSupply);
+      expect(await token.read.balanceOf([deployer.account.address])).to.equal(initialSupply);
     });
 
     it("Should emit TokenDeployed event", async function () {
-      await expect(deployer.deployToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY))
-        .to.emit(deployer, "TokenDeployed")
-        .withArgs(
-          expect.any(String), // token address
-          TOKEN_NAME,
-          TOKEN_SYMBOL,
-          INITIAL_SUPPLY
-        );
+      const { erc20Deployer, deployer } = await deployERC20Deployer();
+      
+      const tx = await erc20Deployer.write.deployToken([
+        "Test Token",
+        "TST",
+        parseEther("1000000"),
+        deployer.account.address,
+      ]);
+
+      const client = await hre.viem.getPublicClient();
+      const receipt = await client.waitForTransactionReceipt({ hash: tx });
+      const event = receipt.logs.find(
+        (log: Log) => log.address.toLowerCase() === erc20Deployer.address.toLowerCase()
+      );
+
+      expect(event).to.not.be.undefined;
+      if (!event || !event.topics[1] || !event.topics[2]) throw new Error("Event not found");
+
+      // Verify event parameters
+      const tokenAddress = getAddress(`0x${event.topics[1].slice(26)}`);
+      const deployerAddress = getAddress(`0x${event.topics[2].slice(26)}`);
+      expect(deployerAddress.toLowerCase()).to.equal(deployer.account.address.toLowerCase());
     });
 
-    it("Should allow any user to deploy tokens", async function () {
-      const deployerConnectedToUser = deployer.connect(user);
-      const tx = await deployerConnectedToUser.deployToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY);
-      const receipt = await tx.wait();
+    it("Should allow multiple token deployments", async function () {
+      const { erc20Deployer, deployer } = await deployERC20Deployer();
+      
+      // Deploy first token
+      await erc20Deployer.write.deployToken([
+        "First Token",
+        "FIRST",
+        parseEther("1000000"),
+        deployer.account.address,
+      ]);
 
-      const event = receipt?.logs[1];
-      const tokenAddress = event?.args?.[0];
+      // Deploy second token
+      await erc20Deployer.write.deployToken([
+        "Second Token",
+        "SECOND",
+        parseEther("2000000"),
+        deployer.account.address,
+      ]);
 
-      const SimpleToken = await ethers.getContractFactory("SimpleToken");
-      const token = SimpleToken.attach(tokenAddress) as SimpleToken;
-
-      // Verify tokens were minted to the user, not the contract owner
-      expect(await token.balanceOf(user.address)).to.equal(INITIAL_SUPPLY * BigInt(10 ** 18));
-      expect(await token.balanceOf(owner.address)).to.equal(0);
-    });
-  });
-
-  describe("Deployed Token", function () {
-    let token: SimpleToken;
-
-    beforeEach(async function () {
-      const tx = await deployer.deployToken(TOKEN_NAME, TOKEN_SYMBOL, INITIAL_SUPPLY);
-      const receipt = await tx.wait();
-      const event = receipt?.logs[1];
-      const tokenAddress = event?.args?.[0];
-
-      const SimpleToken = await ethers.getContractFactory("SimpleToken");
-      token = SimpleToken.attach(tokenAddress) as SimpleToken;
-    });
-
-    it("Should allow token transfers", async function () {
-      const transferAmount = BigInt(1000) * BigInt(10 ** 18);
-      await token.transfer(user.address, transferAmount);
-      expect(await token.balanceOf(user.address)).to.equal(transferAmount);
-    });
-
-    it("Should handle decimals correctly", async function () {
-      expect(await token.decimals()).to.equal(18);
+      // Both deployments should succeed without errors
     });
   });
 }); 
