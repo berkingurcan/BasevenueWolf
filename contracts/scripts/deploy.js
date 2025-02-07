@@ -1,15 +1,15 @@
 const hre = require("hardhat");
 
 async function main() {
-  console.log("Deploying AIAgentRegistry...");
+  console.log("Deploying GameTokenFactory...");
 
-  const AIAgentRegistry = await hre.ethers.getContractFactory("AIAgentRegistry");
-  const registry = await AIAgentRegistry.deploy();
+  const GameTokenFactory = await hre.ethers.getContractFactory("GameTokenFactory");
+  const factory = await GameTokenFactory.deploy();
 
-  await registry.waitForDeployment();
+  await factory.waitForDeployment();
 
-  const address = await registry.getAddress();
-  console.log(`AIAgentRegistry deployed to: ${address}`);
+  const address = await factory.getAddress();
+  console.log(`GameTokenFactory deployed to: ${address}`);
 }
 
 main()
