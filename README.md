@@ -49,6 +49,27 @@ npm run format
 }
 ```
 
+or with memory:
+
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "My name is eylül"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello eylül! How can I assist you today?"
+    },
+    {
+      "role": "user",
+      "content": "What is my name? and which tools do you have"
+    }
+  ]
+}
+```
+
 **Response:**
 
 As [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream), the response will be streamed to the client.
