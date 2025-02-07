@@ -41,12 +41,15 @@ async function initAgent() {
       ],
     });
 
+        // Store buffered conversation history in memory
+    const memory = new MemorySaver();
     const agentConfig = { configurable: { thread_id: "BasevenueWolf!" } };
 
     const tools = await getLangChainTools(agentkit);
     const agent = createReactAgent({
       llm,
       tools,
+      checkpointSaver: memory,
     });
 
     return { agent, config: agentConfig };
@@ -65,26 +68,42 @@ async function main() {
     output: process.stdout,
   });
 
-  const userInput = await new Promise<string>((resolve) => {
-    rl.question("Enter your message: ", resolve);
-  });
-  rl.close();
+  const question = (prompt: string): Promise<string> =>
+    new Promise(resolve => rl.question(prompt, resolve));
 
-  const stream = await agent.stream(
-    { messages: [new HumanMessage(userInput)] },
-    config,
-  );
-  for await (const chunk of stream) {
-    if ("agent" in chunk) {
-      console.log(chunk.agent.messages[0].content);
-    } else if ("tools" in chunk) {
-      console.log(chunk.tools.messages[0].content);
+  try {
+    while (true) {
+      const userInput = await question("\nYour message: ");
+
+      if (userInput.toLowerCase() === "exit") {
+        break;
+      }
+
+      const stream = await agent.stream(
+        { messages: [new HumanMessage(userInput)] },
+        config,
+      );
+
+      for await (const chunk of stream) {
+        if ("agent" in chunk) {
+          console.log(chunk.agent.messages[0].content);
+        } else if ("tools" in chunk) {
+          console.log(chunk.tools.messages[0].content);
+        }
+        console.log("-------------------");
+      }
     }
-    console.log("-------------------");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error:", error.message);
+    }
+    process.exit(1);
+  } finally {
+    rl.close();
   }
 }
 
-// main();
+main();
 
 export { initAgent };
 
