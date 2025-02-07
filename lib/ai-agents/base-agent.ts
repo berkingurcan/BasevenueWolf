@@ -41,7 +41,7 @@ async function initAgent() {
       ],
     });
 
-        // Store buffered conversation history in memory
+    // Store buffered conversation history in memory
     const memory = new MemorySaver();
     const agentConfig = { configurable: { thread_id: "BasevenueWolf!" } };
 
@@ -69,7 +69,7 @@ async function main() {
   });
 
   const question = (prompt: string): Promise<string> =>
-    new Promise(resolve => rl.question(prompt, resolve));
+    new Promise((resolve) => rl.question(prompt, resolve));
 
   try {
     while (true) {
@@ -103,7 +103,7 @@ async function main() {
   }
 }
 
-main();
+// main();
 
 export { initAgent };
 

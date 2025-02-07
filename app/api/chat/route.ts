@@ -1,6 +1,6 @@
 import { initAgent } from "@/lib/ai-agents/base-agent";
 import { openai } from "@ai-sdk/openai";
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -8,12 +8,20 @@ export async function POST(req: Request) {
   const result = await initAgent();
   if (!result) return;
   const { agent, config } = result;
-  const userInput = messages[messages.length - 1].content;
 
-  const stream = await agent.stream(
-    { messages: [new HumanMessage(userInput)] },
-    config,
-  );
+  // Convert OpenAI-style messages to LangChain messages
+  const langChainMessages = messages
+    .map((msg: { role: string; content: string }) => {
+      if (msg.role === "user") {
+        return new HumanMessage(msg.content);
+      } else if (msg.role === "assistant") {
+        return new AIMessage(msg.content);
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  const stream = await agent.stream({ messages: langChainMessages }, config);
 
   console.log(stream);
 
