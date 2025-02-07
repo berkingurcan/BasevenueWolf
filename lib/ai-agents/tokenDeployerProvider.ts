@@ -10,7 +10,9 @@ import { encodeFunctionData } from "viem";
 // Schema for token deployment
 const DeployTokenSchema = z
   .object({
-    factoryAddress: z.string().describe("The GameTokenFactory contract address"),
+    factoryAddress: z
+      .string()
+      .describe("The GameTokenFactory contract address"),
     name: z.string().describe("The name of the token"),
     symbol: z.string().describe("The symbol of the token"),
     tokenURI: z.string().describe("The metadata URI for the token"),
@@ -81,4 +83,4 @@ export class TokenDeployerProvider extends ActionProvider {
   }
 }
 
-export const tokenDeployerProvider = () => new TokenDeployerProvider(); 
+export const tokenDeployerProvider = () => new TokenDeployerProvider();

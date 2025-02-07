@@ -44,13 +44,13 @@ export default function Home() {
     useChat({
       onError: () =>
         toast.error("You've been rate limited, please try again later!"),
-      api: '/api/chat',
-      streamProtocol: 'text', // Use text protocol for SSE
+      api: "/api/chat",
+      streamProtocol: "text", // Use text protocol for SSE
       onResponse: (response) => {
         if (!response.ok) {
           throw new Error(response.statusText);
         }
-      }
+      },
     });
 
   const [files, setFiles] = useState<FileList | null>(null);
