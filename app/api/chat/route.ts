@@ -1,5 +1,4 @@
 import { initAgent } from "@/lib/ai-agents/base-agent";
-import { openai } from "@ai-sdk/openai";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 
 export async function POST(req: Request) {

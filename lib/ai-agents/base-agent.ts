@@ -15,7 +15,6 @@ import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 
-import * as fs from "fs";
 import * as readline from "readline";
 import { config } from "./config";
 import dotenv from "dotenv";
