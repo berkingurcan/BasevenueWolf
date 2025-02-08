@@ -1,5 +1,6 @@
 import { initAgent } from "@/lib/ai-agents/base-agent";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { prompt } from "@/lib/ai-agents/prompts";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -9,6 +10,8 @@ export async function POST(req: Request) {
   const { agent, config } = result;
 
   // Convert OpenAI-style messages to LangChain messages
+  messages.unshift({ role: "system", content: prompt });
+
   const langChainMessages = messages
     .map((msg: { role: string; content: string }) => {
       if (msg.role === "user") {
@@ -20,6 +23,7 @@ export async function POST(req: Request) {
     })
     .filter(Boolean);
 
+    console.log(messages)
   const stream = await agent.stream({ messages: langChainMessages }, config);
 
   console.log(stream);
