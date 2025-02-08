@@ -6,7 +6,7 @@ import {
   Network,
 } from "@coinbase/agentkit";
 import { encodeFunctionData } from "viem";
-
+import { createClient } from 'redis';
 // Schema for mint action
 const MintSchema = z
   .object({
@@ -95,6 +95,9 @@ export class TokenManagerActionProvider extends ActionProvider {
       const receipt = await walletProvider.waitForTransactionReceipt(hash);
 
       const tokenAddress = receipt.logs[0].address;
+      
+      const redisClient = await createClient({ url: process.env.REDIS_URL }).connect();
+      await redisClient.set(args.mintAddress, tokenAddress);
       return `Successfully deployed token "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}\nToken address: ${tokenAddress}`;
     } catch (error) {
       return `Error deploying token: ${error}`;
