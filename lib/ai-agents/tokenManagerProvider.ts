@@ -23,7 +23,9 @@ const DeployTokenSchema = z
     name: z.string().describe("The name of the token"),
     symbol: z.string().describe("The token symbol"),
     amount: z.string().describe("The initial supply to be minted"),
-    mintAddress: z.string().describe("The address to receive the initial minted tokens"),
+    mintAddress: z
+      .string()
+      .describe("The address to receive the initial minted tokens"),
   })
   .strip()
   .describe("The parameters for the deploy token action");
