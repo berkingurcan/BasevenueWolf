@@ -100,7 +100,7 @@ const GameItemSchema = z
     contractAddress: z.string().describe("The ERC721 token contract address"),
     recipient: z.string().describe("The address to receive the minted NFT"),
     tokenId: z.string().describe("The token ID for the NFT"),
-    tokenURI: z.string().optional().describe("The URI for the token metadata")
+    tokenURI: z.string().optional().describe("The URI for the token metadata"),
   })
   .strip()
   .describe("The parameters for creating a game item NFT (ERC721)");
@@ -260,11 +260,7 @@ export class ProductManagerProvider extends ActionProvider {
         data: encodeFunctionData({
           abi: deployItemAbi,
           functionName: "deployGameItem",
-          args: [
-            args.name,
-            args.symbol,
-            args.baseURI,
-          ],
+          args: [args.name, args.symbol, args.baseURI],
         }),
       });
 
@@ -396,10 +392,7 @@ export class ProductManagerProvider extends ActionProvider {
         data: encodeFunctionData({
           abi: mintNftAbi,
           functionName: "mint",
-          args: [
-            `0x${args.recipient.replace("0x", "")}`, 
-            args.tokenURI || "",
-          ],
+          args: [`0x${args.recipient.replace("0x", "")}`, args.tokenURI || ""],
         }),
       });
 
