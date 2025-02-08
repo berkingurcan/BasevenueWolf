@@ -9,7 +9,7 @@ describe("CustomERC20", function () {
 
   async function deployCustomERC20() {
     const [deployer, recipient] = await hre.viem.getWalletClients();
-    
+
     const token = await hre.viem.deployContract("CustomERC20", [
       TOKEN_NAME,
       TOKEN_SYMBOL,
@@ -23,21 +23,21 @@ describe("CustomERC20", function () {
   describe("Deployment", function () {
     it("Should set the correct token name and symbol", async function () {
       const { token } = await deployCustomERC20();
-      
+
       expect(await token.read.name()).to.equal(TOKEN_NAME);
       expect(await token.read.symbol()).to.equal(TOKEN_SYMBOL);
     });
 
     it("Should mint the initial supply to the specified address", async function () {
       const { token, deployer } = await deployCustomERC20();
-      
+
       const balance = await token.read.balanceOf([deployer.account.address]);
       expect(balance).to.equal(INITIAL_SUPPLY);
     });
 
     it("Should set the total supply correctly", async function () {
       const { token } = await deployCustomERC20();
-      
+
       const totalSupply = await token.read.totalSupply();
       expect(totalSupply).to.equal(INITIAL_SUPPLY);
     });
@@ -48,15 +48,18 @@ describe("CustomERC20", function () {
       const { token, deployer, recipient } = await deployCustomERC20();
       const transferAmount = parseEther("100");
 
-      await token.write.transfer(
-        [recipient.account.address, transferAmount],
-        { account: deployer.account.address }
-      );
+      await token.write.transfer([recipient.account.address, transferAmount], {
+        account: deployer.account.address,
+      });
 
-      const recipientBalance = await token.read.balanceOf([recipient.account.address]);
+      const recipientBalance = await token.read.balanceOf([
+        recipient.account.address,
+      ]);
       expect(recipientBalance).to.equal(transferAmount);
 
-      const deployerBalance = await token.read.balanceOf([deployer.account.address]);
+      const deployerBalance = await token.read.balanceOf([
+        deployer.account.address,
+      ]);
       expect(deployerBalance).to.equal(INITIAL_SUPPLY - transferAmount);
     });
 
@@ -65,10 +68,9 @@ describe("CustomERC20", function () {
       const exceedingAmount = INITIAL_SUPPLY + parseEther("1");
 
       await expect(
-        token.write.transfer(
-          [recipient.account.address, exceedingAmount],
-          { account: deployer.account.address }
-        )
+        token.write.transfer([recipient.account.address, exceedingAmount], {
+          account: deployer.account.address,
+        }),
       ).to.be.rejected;
     });
   });
@@ -78,10 +80,9 @@ describe("CustomERC20", function () {
       const { token, deployer, recipient } = await deployCustomERC20();
       const approvalAmount = parseEther("100");
 
-      await token.write.approve(
-        [recipient.account.address, approvalAmount],
-        { account: deployer.account.address }
-      );
+      await token.write.approve([recipient.account.address, approvalAmount], {
+        account: deployer.account.address,
+      });
 
       const allowance = await token.read.allowance([
         deployer.account.address,
@@ -91,10 +92,12 @@ describe("CustomERC20", function () {
 
       await token.write.transferFrom(
         [deployer.account.address, recipient.account.address, approvalAmount],
-        { account: recipient.account.address }
+        { account: recipient.account.address },
       );
 
-      const recipientBalance = await token.read.balanceOf([recipient.account.address]);
+      const recipientBalance = await token.read.balanceOf([
+        recipient.account.address,
+      ]);
       expect(recipientBalance).to.equal(approvalAmount);
 
       const newAllowance = await token.read.allowance([
@@ -109,17 +112,16 @@ describe("CustomERC20", function () {
       const approvalAmount = parseEther("100");
       const transferAmount = approvalAmount + parseEther("1");
 
-      await token.write.approve(
-        [recipient.account.address, approvalAmount],
-        { account: deployer.account.address }
-      );
+      await token.write.approve([recipient.account.address, approvalAmount], {
+        account: deployer.account.address,
+      });
 
       await expect(
         token.write.transferFrom(
           [deployer.account.address, recipient.account.address, transferAmount],
-          { account: recipient.account.address }
-        )
+          { account: recipient.account.address },
+        ),
       ).to.be.rejected;
     });
   });
-}); 
+});

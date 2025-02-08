@@ -6,9 +6,13 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: `../env.local`, override: true });
 
 // Ensure required environment variables are set
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "0000000000000000000000000000000000000000000000000000000000000000";
+const PRIVATE_KEY =
+  process.env.PRIVATE_KEY ||
+  "0000000000000000000000000000000000000000000000000000000000000000";
 const CUSTOM_NETWORK_URL = process.env.CUSTOM_NETWORK_URL || "";
-const CUSTOM_NETWORK_CHAIN_ID = process.env.CUSTOM_NETWORK_CHAIN_ID ? parseInt(process.env.CUSTOM_NETWORK_CHAIN_ID) : 1234;
+const CUSTOM_NETWORK_CHAIN_ID = process.env.CUSTOM_NETWORK_CHAIN_ID
+  ? parseInt(process.env.CUSTOM_NETWORK_CHAIN_ID)
+  : 1234;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -21,8 +25,7 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
-    hardhat: {
-    },
+    hardhat: {},
     custom: {
       url: CUSTOM_NETWORK_URL,
       chainId: CUSTOM_NETWORK_CHAIN_ID,
@@ -38,4 +41,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-export default config; 
+export default config;

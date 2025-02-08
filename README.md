@@ -30,6 +30,7 @@ npm run format
 ```
 
 ## API Documentation
+
 ### Health Check API
 
 **Endpoint**: `GET /api/health`

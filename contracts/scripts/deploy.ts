@@ -37,15 +37,16 @@ async function main() {
   // Get the token address from the event logs
   const receipt = await client.waitForTransactionReceipt({ hash: tx });
   const event = receipt.logs.find(
-    (log: Log) => log.address.toLowerCase() === erc20Deployer.address.toLowerCase()
+    (log: Log) =>
+      log.address.toLowerCase() === erc20Deployer.address.toLowerCase(),
   );
-  
+
   if (event && event.topics[1]) {
     const tokenAddress = `0x${event.topics[1].slice(26)}`;
     console.log(`\nDeployment successful!`);
     console.log(`Sample token deployed to: ${tokenAddress}`);
     console.log(`Initial supply: ${formatEther(initialSupply)} ${tokenSymbol}`);
-    
+
     // Print summary
     console.log(`\nDeployment Summary:`);
     console.log(`Chain ID: ${chainId}`);
@@ -59,4 +60,4 @@ main()
   .catch((error) => {
     console.error(error);
     process.exit(1);
-  }); 
+  });

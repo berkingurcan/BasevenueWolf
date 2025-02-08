@@ -1,5 +1,9 @@
 import { initAgent } from "@/lib/ai-agents/base-agent";
-import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
+import {
+  HumanMessage,
+  AIMessage,
+  SystemMessage,
+} from "@langchain/core/messages";
 import { prompt } from "@/lib/ai-agents/prompts";
 
 export async function POST(req: Request) {
