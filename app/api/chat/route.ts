@@ -5,7 +5,6 @@ import {
   SystemMessage,
 } from "@langchain/core/messages";
 import { prompt } from "@/lib/ai-agents/prompts";
-import { use } from "chai";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -33,7 +32,6 @@ export async function POST(req: Request) {
     })
     .filter(Boolean);
 
-  console.log(messages);
   const stream = await agent.stream({ messages: langChainMessages }, config);
 
   console.log(stream);

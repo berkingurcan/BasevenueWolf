@@ -94,7 +94,8 @@ export class TokenManagerActionProvider extends ActionProvider {
 
       const receipt = await walletProvider.waitForTransactionReceipt(hash);
 
-      return `Successfully deployed token "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}`;
+      const tokenAddress = receipt.logs[0].address;
+      return `Successfully deployed token "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}\nToken address: ${tokenAddress}`;
     } catch (error) {
       return `Error deploying token: ${error}`;
     }
