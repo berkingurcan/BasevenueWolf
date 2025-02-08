@@ -5,16 +5,20 @@ import {
   SystemMessage,
 } from "@langchain/core/messages";
 import { prompt } from "@/lib/ai-agents/prompts";
+import { use } from "chai";
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  const body = await req.json();
+  const userWalletAddress =
+    body.userWalletAddress || "0x5e7EC86C282BFF4583C80E5b275fc10246d19dBD";
+  const { messages } = body;
 
   const result = await initAgent();
   if (!result) return;
   const { agent, config } = result;
 
   // Convert OpenAI-style messages to LangChain messages
-  messages.unshift({ role: "system", content: prompt });
+  messages.unshift({ role: "system", content: prompt(userWalletAddress) });
 
   const langChainMessages = messages
     .map((msg: { role: string; content: string }) => {
@@ -29,6 +33,7 @@ export async function POST(req: Request) {
     })
     .filter(Boolean);
 
+  console.log(messages);
   const stream = await agent.stream({ messages: langChainMessages }, config);
 
   console.log(stream);

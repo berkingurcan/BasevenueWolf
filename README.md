@@ -60,7 +60,8 @@ Check the health status of the application.
       "role": "user",
       "content": "Which tools do you have"
     }
-  ]
+  ],
+  "userWalletAddress": "0x5e7EC86C282BFF4583C80E5b275fc10246d19dBD"
 }
 ```
 

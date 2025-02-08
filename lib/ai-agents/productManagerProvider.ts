@@ -39,7 +39,9 @@ const DeployGameProductSchema = z
     name: z.string().describe("The name of the game product token"),
     symbol: z.string().describe("The game product token symbol"),
     amount: z.string().describe("The initial supply to be minted"),
-    mintAddress: z.string().describe("The address to receive the initial minted tokens"),
+    mintAddress: z
+      .string()
+      .describe("The address to receive the initial minted tokens"),
   })
   .strip()
   .describe("The parameters for deploying a new game product token");
