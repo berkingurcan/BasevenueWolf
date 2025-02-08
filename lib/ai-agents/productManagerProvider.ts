@@ -33,12 +33,161 @@ const GameItemSchema = z
   .strip()
   .describe("The parameters for creating a game item NFT (ERC721)");
 
+// Schema for deploying game product
+const DeployGameProductSchema = z
+  .object({
+    name: z.string().describe("The name of the game product token"),
+    symbol: z.string().describe("The game product token symbol"),
+    amount: z.string().describe("The initial supply to be minted"),
+    mintAddress: z.string().describe("The address to receive the initial minted tokens"),
+  })
+  .strip()
+  .describe("The parameters for deploying a new game product token");
+
+// Schema for deploying game item (NFT)
+const DeployGameItemSchema = z
+  .object({
+    name: z.string().describe("The name of the game item collection"),
+    symbol: z.string().describe("The game item collection symbol"),
+    mintAddress: z.string().describe("The address that can mint NFTs"),
+  })
+  .strip()
+  .describe("The parameters for deploying a new game item collection");
+
 /**
  * ProductManagerProvider handles game product operations using ERC20 and ERC721 tokens
  */
 export class ProductManagerProvider extends ActionProvider {
   constructor() {
     super("product-manager", []);
+  }
+
+  /**
+   * Deploys a new game product token contract
+   */
+  @CreateAction({
+    name: "deploy_game_product",
+    description: `
+    This tool will deploy a new game product token contract (ERC20).
+    
+    Suitable for:
+    - In-game currencies (coins, gems)
+    - Energy points
+    - Experience points
+    - Any fungible game resource
+    
+    Required inputs:
+    - name: The name of the token (e.g., "Game Coins", "Energy Crystals")
+    - symbol: The token symbol (e.g., "GCOIN", "ENRG")
+    - amount: The initial supply to be minted
+    - mintAddress: The address that will receive the initial minted tokens
+    `,
+    schema: DeployGameProductSchema,
+  })
+  async deployGameProduct(
+    walletProvider: EvmWalletProvider,
+    args: z.infer<typeof DeployGameProductSchema>,
+  ): Promise<string> {
+    try {
+      // GameProductDeployer deployGameProduct function ABI
+      const deployProductAbi = [
+        {
+          inputs: [
+            { name: "name", type: "string" },
+            { name: "symbol", type: "string" },
+            { name: "amount", type: "uint256" },
+            { name: "mintAddress", type: "address" },
+          ],
+          name: "deployGameProduct",
+          outputs: [{ name: "tokenAddress", type: "address" }],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ] as const;
+
+      const hash = await walletProvider.sendTransaction({
+        to: `0x${(process.env.GAME_PRODUCT_DEPLOYER_ADDRESS || "").replace("0x", "")}`,
+        data: encodeFunctionData({
+          abi: deployProductAbi,
+          functionName: "deployGameProduct",
+          args: [
+            args.name,
+            args.symbol,
+            BigInt(args.amount),
+            `0x${args.mintAddress.replace("0x", "")}`,
+          ],
+        }),
+      });
+
+      const receipt = await walletProvider.waitForTransactionReceipt(hash);
+
+      return `Successfully deployed game product "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}`;
+    } catch (error) {
+      return `Error deploying game product: ${error}`;
+    }
+  }
+
+  /**
+   * Deploys a new game item collection contract (NFT)
+   */
+  @CreateAction({
+    name: "deploy_game_item_collection",
+    description: `
+    This tool will deploy a new game item collection contract (ERC721).
+    
+    Suitable for:
+    - Unique characters
+    - Weapons and equipment
+    - Special items
+    - Collectibles
+    - Any non-fungible game asset
+    
+    Required inputs:
+    - name: The name of the collection (e.g., "Legendary Weapons", "Hero Characters")
+    - symbol: The collection symbol (e.g., "WEAPON", "HERO")
+    - mintAddress: The address that will have minting privileges
+    `,
+    schema: DeployGameItemSchema,
+  })
+  async deployGameItemCollection(
+    walletProvider: EvmWalletProvider,
+    args: z.infer<typeof DeployGameItemSchema>,
+  ): Promise<string> {
+    try {
+      // GameItemDeployer deployGameItem function ABI (hypothetical)
+      const deployItemAbi = [
+        {
+          inputs: [
+            { name: "name", type: "string" },
+            { name: "symbol", type: "string" },
+            { name: "mintAddress", type: "address" },
+          ],
+          name: "deployGameItem",
+          outputs: [{ name: "tokenAddress", type: "address" }],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ] as const;
+
+      const hash = await walletProvider.sendTransaction({
+        to: `0x${(process.env.GAME_ITEM_DEPLOYER_ADDRESS || "").replace("0x", "")}`,
+        data: encodeFunctionData({
+          abi: deployItemAbi,
+          functionName: "deployGameItem",
+          args: [
+            args.name,
+            args.symbol,
+            `0x${args.mintAddress.replace("0x", "")}`,
+          ],
+        }),
+      });
+
+      const receipt = await walletProvider.waitForTransactionReceipt(hash);
+
+      return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}`;
+    } catch (error) {
+      return `Error deploying game item collection: ${error}`;
+    }
   }
 
   /**
