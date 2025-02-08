@@ -95,3 +95,56 @@ As [ReadableStream](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStr
   "content": "I have the following tools: ..."
 }
 ```
+
+### SDK API
+
+**Endpoint**: `GET /api/sdk`
+
+Retrieve user data from the SDK.
+
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| userWalletAddress | string | Yes | The wallet address of the user |
+
+#### Example Request
+
+```bash
+GET "/api/sdk?userWalletAddress=0x123...abc"
+```
+
+#### Success Response
+
+**Code**: 200 OK
+
+```json
+{
+  "data": {
+    // User data object
+  }
+}
+```
+
+#### Error Responses
+
+**Code**: 400 BAD REQUEST
+```json
+{
+  "error": "userWalletAddress is required"
+}
+```
+
+**Code**: 404 NOT FOUND
+```json
+{
+  "error": "User not found"
+}
+```
+
+**Code**: 500 INTERNAL SERVER ERROR
+```json
+{
+  "error": "Internal server error"
+}
+```
