@@ -6,6 +6,70 @@ import {
   Network,
 } from "@coinbase/agentkit";
 import { encodeFunctionData } from "viem";
+import { createClient } from "redis";
+
+// Redis key prefixes for different product types
+const REDIS_KEYS = {
+  GAME_PRODUCT: "game_product:",
+  GAME_ITEM: "game_item:",
+  PRODUCT_LIST: "product_list",
+  ITEM_LIST: "item_list",
+  USER_PRODUCTS: "user_products:",
+} as const;
+
+// Helper function to store product data in Redis
+async function storeProductInRedis(
+  productType: "game_product" | "game_item",
+  productData: {
+    contractAddress: string;
+    userWalletAddress: string;
+  }
+) {
+  try {
+    const redisClient = await createClient({
+      url: process.env.REDIS_URL,
+    }).connect();
+
+    const key = `${
+      productType === "game_product" ? REDIS_KEYS.GAME_PRODUCT : REDIS_KEYS.GAME_ITEM
+    }${productData.contractAddress}`;
+
+    // Store contract address
+    await redisClient.set(key, productData.contractAddress);
+
+    // Add to the list of products/items
+    const listKey = productType === "game_product" ? REDIS_KEYS.PRODUCT_LIST : REDIS_KEYS.ITEM_LIST;
+    await redisClient.sAdd(listKey, productData.contractAddress);
+
+    // Add to user's products list
+    const userKey = `${REDIS_KEYS.USER_PRODUCTS}${productData.userWalletAddress}`;
+    await redisClient.sAdd(userKey, productData.contractAddress);
+
+    await redisClient.quit();
+    return true;
+  } catch (error) {
+    console.error("Redis storage error:", error);
+    return false;
+  }
+}
+
+// Helper function to get product data from Redis
+export async function getProductFromRedis(userWalletAddress: string): Promise<string[]> {
+  try {
+    const redisClient = await createClient({
+      url: process.env.REDIS_URL,
+    }).connect();
+
+    const userKey = `${REDIS_KEYS.USER_PRODUCTS}${userWalletAddress}`;
+    const products = await redisClient.sMembers(userKey);
+
+    await redisClient.quit();
+    return products;
+  } catch (error) {
+    console.error("Redis retrieval error:", error);
+    return [];
+  }
+}
 
 // Schema for ERC20 game product creation
 const GameProductSchema = z
@@ -122,8 +186,17 @@ export class ProductManagerProvider extends ActionProvider {
       });
 
       const receipt = await walletProvider.waitForTransactionReceipt(hash);
+      const contractAddress = receipt.logs[0].address;
+      const userWalletAddress = args.mintAddress;
 
-      return `Successfully deployed game product "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}`;
+      // Store product data in Redis
+      const stored = await storeProductInRedis("game_product", {
+        contractAddress,
+        userWalletAddress,
+      });
+
+      const redisStatus = stored ? "Product data stored in Redis." : "Warning: Failed to store product data in Redis.";
+      return `Successfully deployed game product "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game product: ${error}`;
     }
@@ -185,8 +258,17 @@ export class ProductManagerProvider extends ActionProvider {
       });
 
       const receipt = await walletProvider.waitForTransactionReceipt(hash);
+      const contractAddress = receipt.logs[0].address;
+      const userWalletAddress = args.mintAddress;
 
-      return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}`;
+      // Store item collection data in Redis
+      const stored = await storeProductInRedis("game_item", {
+        contractAddress,
+        userWalletAddress,
+      });
+
+      const redisStatus = stored ? "Item collection data stored in Redis." : "Warning: Failed to store item collection data in Redis.";
+      return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game item collection: ${error}`;
     }
