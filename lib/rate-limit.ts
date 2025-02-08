@@ -34,4 +34,4 @@ export default function rateLimit(options?: Options) {
         return resolve();
       }),
   };
-} 
+}

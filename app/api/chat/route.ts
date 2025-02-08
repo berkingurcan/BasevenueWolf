@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     }
     return new Response(
@@ -99,7 +99,7 @@ export async function POST(req: Request) {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
   }
 }

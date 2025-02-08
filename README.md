@@ -104,9 +104,9 @@ Retrieve user data from the SDK.
 
 #### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| userWalletAddress | string | Yes | The wallet address of the user |
+| Parameter         | Type   | Required | Description                    |
+| ----------------- | ------ | -------- | ------------------------------ |
+| userWalletAddress | string | Yes      | The wallet address of the user |
 
 #### Example Request
 
@@ -129,6 +129,7 @@ GET "/api/sdk?userWalletAddress=0x123...abc"
 #### Error Responses
 
 **Code**: 400 BAD REQUEST
+
 ```json
 {
   "error": "userWalletAddress is required"
@@ -136,6 +137,7 @@ GET "/api/sdk?userWalletAddress=0x123...abc"
 ```
 
 **Code**: 404 NOT FOUND
+
 ```json
 {
   "error": "User not found"
@@ -143,6 +145,7 @@ GET "/api/sdk?userWalletAddress=0x123...abc"
 ```
 
 **Code**: 500 INTERNAL SERVER ERROR
+
 ```json
 {
   "error": "Internal server error"
