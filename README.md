@@ -118,11 +118,11 @@ GET "/api/sdk?userWalletAddress=0x123...abc"
 
 **Code**: 200 OK
 
+Returns the token address of the user
+
 ```json
 {
-  "data": {
-    // User data object
-  }
+  "data": "0x9876543210"
 }
 ```
 
