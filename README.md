@@ -151,3 +151,57 @@ Returns the token address of the user
   "error": "Internal server error"
 }
 ```
+
+### Products API
+
+**Endpoint**: `GET /api/sdk/products`
+
+Retrieve all products (ERC20 tokens and ERC721 NFTs) associated with a user's wallet address.
+
+#### Parameters
+
+| Parameter         | Type   | Required | Description                    |
+| ----------------- | ------ | -------- | ------------------------------ |
+| userWalletAddress | string | Yes      | The wallet address of the user |
+
+#### Example Request
+
+```bash
+GET "/api/sdk/products?userWalletAddress=0x123...abc"
+```
+
+#### Success Response
+
+**Code**: 200 OK
+
+```json
+{
+  "success": true,
+  "data": {
+    "userWalletAddress": "0x123...abc",
+    "products": [
+      "0xabc...123", // Contract addresses of products
+      "0xdef...456"
+    ],
+    "count": 2
+  }
+}
+```
+
+#### Error Responses
+
+**Code**: 400 BAD REQUEST
+
+```json
+{
+  "error": "userWalletAddress is required"
+}
+```
+
+**Code**: 500 INTERNAL SERVER ERROR
+
+```json
+{
+  "error": "Failed to fetch products"
+}
+```
