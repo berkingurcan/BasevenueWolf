@@ -1,5 +1,5 @@
 import { initAgent } from "@/lib/ai-agents/base-agent";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { prompt } from "@/lib/ai-agents/prompts";
 
 export async function POST(req: Request) {
@@ -18,12 +18,13 @@ export async function POST(req: Request) {
         return new HumanMessage(msg.content);
       } else if (msg.role === "assistant") {
         return new AIMessage(msg.content);
+      } else if (msg.role === "system") {
+        return new SystemMessage(msg.content);
       }
       return null;
     })
     .filter(Boolean);
 
-    console.log(messages)
   const stream = await agent.stream({ messages: langChainMessages }, config);
 
   console.log(stream);
