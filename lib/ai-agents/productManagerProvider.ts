@@ -23,7 +23,7 @@ async function storeProductInRedis(
   productData: {
     contractAddress: string;
     userWalletAddress: string;
-  }
+  },
 ) {
   try {
     const redisClient = await createClient({
@@ -31,14 +31,19 @@ async function storeProductInRedis(
     }).connect();
 
     const key = `${
-      productType === "game_product" ? REDIS_KEYS.GAME_PRODUCT : REDIS_KEYS.GAME_ITEM
+      productType === "game_product"
+        ? REDIS_KEYS.GAME_PRODUCT
+        : REDIS_KEYS.GAME_ITEM
     }${productData.contractAddress}`;
 
     // Store contract address
     await redisClient.set(key, productData.contractAddress);
 
     // Add to the list of products/items
-    const listKey = productType === "game_product" ? REDIS_KEYS.PRODUCT_LIST : REDIS_KEYS.ITEM_LIST;
+    const listKey =
+      productType === "game_product"
+        ? REDIS_KEYS.PRODUCT_LIST
+        : REDIS_KEYS.ITEM_LIST;
     await redisClient.sAdd(listKey, productData.contractAddress);
 
     // Add to user's products list
@@ -54,7 +59,9 @@ async function storeProductInRedis(
 }
 
 // Helper function to get product data from Redis
-export async function getProductFromRedis(userWalletAddress: string): Promise<string[]> {
+export async function getProductFromRedis(
+  userWalletAddress: string,
+): Promise<string[]> {
   try {
     const redisClient = await createClient({
       url: process.env.REDIS_URL,
@@ -195,7 +202,9 @@ export class ProductManagerProvider extends ActionProvider {
         userWalletAddress,
       });
 
-      const redisStatus = stored ? "Product data stored in Redis." : "Warning: Failed to store product data in Redis.";
+      const redisStatus = stored
+        ? "Product data stored in Redis."
+        : "Warning: Failed to store product data in Redis.";
       return `Successfully deployed game product "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game product: ${error}`;
@@ -267,7 +276,9 @@ export class ProductManagerProvider extends ActionProvider {
         userWalletAddress,
       });
 
-      const redisStatus = stored ? "Item collection data stored in Redis." : "Warning: Failed to store item collection data in Redis.";
+      const redisStatus = stored
+        ? "Item collection data stored in Redis."
+        : "Warning: Failed to store item collection data in Redis.";
       return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game item collection: ${error}`;
