@@ -100,6 +100,7 @@ const GameItemSchema = z
     contractAddress: z.string().describe("The ERC721 token contract address"),
     recipient: z.string().describe("The address to receive the minted NFT"),
     tokenId: z.string().describe("The token ID for the NFT"),
+    tokenURI: z.string().optional().describe("The URI for the token metadata")
   })
   .strip()
   .describe("The parameters for creating a game item NFT (ERC721)");
@@ -122,6 +123,7 @@ const DeployGameItemSchema = z
   .object({
     name: z.string().describe("The name of the game item collection"),
     symbol: z.string().describe("The game item collection symbol"),
+    baseURI: z.string().describe("The base URI for token metadata"),
     mintAddress: z.string().describe("The address that can mint NFTs"),
   })
   .strip()
@@ -244,7 +246,7 @@ export class ProductManagerProvider extends ActionProvider {
           inputs: [
             { name: "name", type: "string" },
             { name: "symbol", type: "string" },
-            { name: "mintAddress", type: "address" },
+            { name: "baseURI", type: "string" },
           ],
           name: "deployGameItem",
           outputs: [{ name: "tokenAddress", type: "address" }],
@@ -261,7 +263,7 @@ export class ProductManagerProvider extends ActionProvider {
           args: [
             args.name,
             args.symbol,
-            `0x${args.mintAddress.replace("0x", "")}`,
+            args.baseURI,
           ],
         }),
       });
@@ -380,10 +382,10 @@ export class ProductManagerProvider extends ActionProvider {
         {
           inputs: [
             { name: "to", type: "address" },
-            { name: "tokenId", type: "uint256" },
+            { name: "tokenURI", type: "string" },
           ],
           name: "mint",
-          outputs: [],
+          outputs: [{ name: "tokenId", type: "uint256" }],
           stateMutability: "nonpayable",
           type: "function",
         },
@@ -394,7 +396,10 @@ export class ProductManagerProvider extends ActionProvider {
         data: encodeFunctionData({
           abi: mintNftAbi,
           functionName: "mint",
-          args: [`0x${args.recipient.replace("0x", "")}`, BigInt(args.tokenId)],
+          args: [
+            `0x${args.recipient.replace("0x", "")}`, 
+            args.tokenURI || "",
+          ],
         }),
       });
 
