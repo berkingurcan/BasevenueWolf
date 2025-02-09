@@ -91,18 +91,6 @@ const GameProductSchema = z
   .strip()
   .describe("The parameters for creating a game product token (ERC20)");
 
-// Schema for ERC721 game item creation
-const GameItemSchema = z
-  .object({
-    name: z.string().describe("Name of the game item"),
-    symbol: z.string().describe("Symbol for the NFT"),
-    description: z.string().describe("Description of the game item"),
-    contractAddress: z.string().describe("The ERC721 token contract address"),
-    recipient: z.string().describe("The address to receive the minted NFT"),
-    tokenURI: z.string().describe("The URI for the token metadata"),
-  })
-  .strip()
-  .describe("The parameters for creating a game item NFT (ERC721)");
 
 // Schema for deploying game product
 const DeployGameProductSchema = z
@@ -344,74 +332,6 @@ export class ProductManagerProvider extends ActionProvider {
       return `Successfully created and minted ${args.amount} ${args.name} (${args.symbol}) tokens to ${args.recipient}.\nTransaction hash: ${hash}`;
     } catch (error) {
       return `Error creating game product: ${error}`;
-    }
-  }
-
-  /**
-   * Creates and mints game items using ERC721 NFTs
-   *
-   * @param walletProvider - The wallet provider
-   * @param args - The arguments for creating the game item
-   * @returns A string indicating the success or failure of the operation
-   */
-  @CreateAction({
-    name: "create_game_item",
-    description: `
-    This tool will create and mint game items using ERC721 NFTs.
-    
-    Suitable for:
-    - Unique characters
-    - Weapons and equipment
-    - Special items
-    - Collectibles
-    - Any non-fungible game asset
-    
-    Required inputs:
-    - name: Item name (e.g., "Legendary Sword", "Hero Character")
-    - symbol: NFT symbol (e.g., "GSWORD", "HERO")
-    - description: Item description
-    - contractAddress: The deployed ERC721 contract address
-    - recipient: Address to receive the minted NFT
-    - tokenURI: The URI for the token metadata
-    `,
-    schema: GameItemSchema,
-  })
-  async createGameItem(
-    walletProvider: EvmWalletProvider,
-    args: z.infer<typeof GameItemSchema>,
-  ): Promise<string> {
-    try {
-      // ERC721 mint function ABI
-      const mintNftAbi = [
-        {
-          inputs: [
-            { name: "to", type: "address" },
-            { name: "tokenURI", type: "string" },
-          ],
-          name: "mint",
-          outputs: [{ name: "tokenId", type: "uint256" }],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ] as const;
-
-      const hash = await walletProvider.sendTransaction({
-        to: `0x${args.contractAddress.replace("0x", "")}`,
-        data: encodeFunctionData({
-          abi: mintNftAbi,
-          functionName: "mint",
-          args: [`0x${args.recipient.replace("0x", "")}`, args.tokenURI],
-        }),
-      });
-
-      const receipt = await walletProvider.waitForTransactionReceipt(hash);
-
-      // Get the tokenId from the event logs
-      const tokenId = receipt.logs[0].topics[3]; // The tokenId is typically in the Transfer event
-
-      return `Successfully created and minted NFT ${args.name} (${args.symbol}) with ID ${tokenId} to ${args.recipient}.\nTransaction hash: ${hash}`;
-    } catch (error) {
-      return `Error creating game item: ${error}`;
     }
   }
 
