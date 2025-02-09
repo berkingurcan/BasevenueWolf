@@ -91,19 +91,6 @@ const GameProductSchema = z
   .strip()
   .describe("The parameters for creating a game product token (ERC20)");
 
-// Schema for ERC721 game item creation
-const GameItemSchema = z
-  .object({
-    name: z.string().describe("Name of the game item"),
-    symbol: z.string().describe("Symbol for the NFT"),
-    description: z.string().describe("Description of the game item"),
-    contractAddress: z.string().describe("The ERC721 token contract address"),
-    recipient: z.string().describe("The address to receive the minted NFT"),
-    tokenId: z.string().describe("The token ID for the NFT"),
-  })
-  .strip()
-  .describe("The parameters for creating a game item NFT (ERC721)");
-
 // Schema for deploying game product
 const DeployGameProductSchema = z
   .object({
@@ -122,6 +109,7 @@ const DeployGameItemSchema = z
   .object({
     name: z.string().describe("The name of the game item collection"),
     symbol: z.string().describe("The game item collection symbol"),
+    baseURI: z.string().describe("The base URI for token metadata"),
     mintAddress: z.string().describe("The address that can mint NFTs"),
   })
   .strip()
@@ -213,6 +201,10 @@ export class ProductManagerProvider extends ActionProvider {
 
   /**
    * Deploys a new game item collection contract (NFT)
+   *
+   * @param walletProvider - The wallet provider
+   * @param args - The arguments for deploying the game item collection
+   * @returns A string indicating the success or failure of the operation
    */
   @CreateAction({
     name: "deploy_game_item_collection",
@@ -229,7 +221,7 @@ export class ProductManagerProvider extends ActionProvider {
     Required inputs:
     - name: The name of the collection (e.g., "Legendary Weapons", "Hero Characters")
     - symbol: The collection symbol (e.g., "WEAPON", "HERO")
-    - mintAddress: The address that will have minting privileges
+    - baseURI: The base URI for token metadata
     `,
     schema: DeployGameItemSchema,
   })
@@ -244,7 +236,7 @@ export class ProductManagerProvider extends ActionProvider {
           inputs: [
             { name: "name", type: "string" },
             { name: "symbol", type: "string" },
-            { name: "mintAddress", type: "address" },
+            { name: "baseURI", type: "string" },
           ],
           name: "deployGameItem",
           outputs: [{ name: "tokenAddress", type: "address" }],
@@ -258,11 +250,7 @@ export class ProductManagerProvider extends ActionProvider {
         data: encodeFunctionData({
           abi: deployItemAbi,
           functionName: "deployGameItem",
-          args: [
-            args.name,
-            args.symbol,
-            `0x${args.mintAddress.replace("0x", "")}`,
-          ],
+          args: [args.name, args.symbol, args.baseURI],
         }),
       });
 
@@ -276,9 +264,6 @@ export class ProductManagerProvider extends ActionProvider {
         userWalletAddress,
       });
 
-      const redisStatus = stored
-        ? "Item collection data stored in Redis."
-        : "Warning: Failed to store item collection data in Redis.";
       return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game item collection: ${error}`;
@@ -287,6 +272,10 @@ export class ProductManagerProvider extends ActionProvider {
 
   /**
    * Creates and mints game product using ERC20 tokens
+   *
+   * @param walletProvider - The wallet provider
+   * @param args - The arguments for creating the game product
+   * @returns A string indicating the success or failure of the operation
    */
   @CreateAction({
     name: "create_game_product",
@@ -342,67 +331,6 @@ export class ProductManagerProvider extends ActionProvider {
       return `Successfully created and minted ${args.amount} ${args.name} (${args.symbol}) tokens to ${args.recipient}.\nTransaction hash: ${hash}`;
     } catch (error) {
       return `Error creating game product: ${error}`;
-    }
-  }
-
-  /**
-   * Creates and mints game items using ERC721 NFTs
-   */
-  @CreateAction({
-    name: "create_game_item",
-    description: `
-    This tool will create and mint game items using ERC721 NFTs.
-    
-    Suitable for:
-    - Unique characters
-    - Weapons and equipment
-    - Special items
-    - Collectibles
-    - Any non-fungible game asset
-    
-    Required inputs:
-    - name: Item name (e.g., "Legendary Sword", "Hero Character")
-    - symbol: NFT symbol (e.g., "GSWORD", "HERO")
-    - description: Item description
-    - contractAddress: The deployed ERC721 contract address
-    - recipient: Address to receive the minted NFT
-    - tokenId: Unique identifier for the NFT
-    `,
-    schema: GameItemSchema,
-  })
-  async createGameItem(
-    walletProvider: EvmWalletProvider,
-    args: z.infer<typeof GameItemSchema>,
-  ): Promise<string> {
-    try {
-      // ERC721 mint function ABI
-      const mintNftAbi = [
-        {
-          inputs: [
-            { name: "to", type: "address" },
-            { name: "tokenId", type: "uint256" },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ] as const;
-
-      const hash = await walletProvider.sendTransaction({
-        to: `0x${args.contractAddress.replace("0x", "")}`,
-        data: encodeFunctionData({
-          abi: mintNftAbi,
-          functionName: "mint",
-          args: [`0x${args.recipient.replace("0x", "")}`, BigInt(args.tokenId)],
-        }),
-      });
-
-      await walletProvider.waitForTransactionReceipt(hash);
-
-      return `Successfully created and minted NFT ${args.name} (${args.symbol}) with ID ${args.tokenId} to ${args.recipient}.\nTransaction hash: ${hash}`;
-    } catch (error) {
-      return `Error creating game item: ${error}`;
     }
   }
 
