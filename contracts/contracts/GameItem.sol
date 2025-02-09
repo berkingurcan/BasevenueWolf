@@ -37,10 +37,12 @@ contract GameItem is ERC721URIStorage {
      * @param to The address that will own the minted token
      * @return uint256 ID of the newly minted token
      */
-    function mint(address to) public returns (uint256) {
+    function mint(address to, string memory tokenURI) public returns (uint256) {
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
-        
+        if (bytes(tokenURI).length > 0) {
+            _setTokenURI(tokenId, tokenURI);
+        }
         return tokenId;
     }
 }

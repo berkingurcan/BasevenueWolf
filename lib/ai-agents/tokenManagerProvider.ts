@@ -7,15 +7,6 @@ import {
 } from "@coinbase/agentkit";
 import { encodeFunctionData } from "viem";
 import { createClient } from "redis";
-// Schema for mint action
-const MintSchema = z
-  .object({
-    contractAddress: z.string().describe("The ERC20 token contract address"),
-    recipient: z.string().describe("The address to receive the minted tokens"),
-    amount: z.string().describe("The amount of tokens to mint"),
-  })
-  .strip()
-  .describe("The parameters for the mint action");
 
 // Schema for deploy token action
 const DeployTokenSchema = z
@@ -104,62 +95,6 @@ export class TokenManagerActionProvider extends ActionProvider {
       return `Successfully deployed token "${args.name}" (${args.symbol}) with initial supply of ${args.amount} to ${args.mintAddress}.\nTransaction hash: ${hash}\nToken address: ${tokenAddress}`;
     } catch (error) {
       return `Error deploying token: ${error}`;
-    }
-  }
-
-  /**
-   * Mints ERC20 tokens to a specified address
-   * @param walletProvider - The wallet provider to mint the tokens from
-   * @param args - The parameters for the mint action
-   * @returns A message containing the mint details
-   */
-  @CreateAction({
-    name: "mint_tokens",
-    description: `
-    This tool will mint ERC20 tokens to a specified address.
-
-    It takes the following inputs:
-    - contractAddress: The contract address of the ERC20 token
-    - recipient: The address that will receive the minted tokens
-    - amount: The amount of tokens to mint
-
-    Note: This action will only work if the connected wallet has minting privileges on the contract.
-    `,
-    schema: MintSchema,
-  })
-  async mint(
-    walletProvider: EvmWalletProvider,
-    args: z.infer<typeof MintSchema>,
-  ): Promise<string> {
-    try {
-      // ERC20 mint function ABI
-      const mintAbi = [
-        {
-          inputs: [
-            { name: "to", type: "address" },
-            { name: "amount", type: "uint256" },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ] as const;
-
-      const hash = await walletProvider.sendTransaction({
-        to: `0x${args.contractAddress.replace("0x", "")}`,
-        data: encodeFunctionData({
-          abi: mintAbi,
-          functionName: "mint",
-          args: [`0x${args.recipient.replace("0x", "")}`, BigInt(args.amount)],
-        }),
-      });
-
-      await walletProvider.waitForTransactionReceipt(hash);
-
-      return `Successfully minted ${args.amount} tokens to ${args.recipient}.\nTransaction hash: ${hash}`;
-    } catch (error) {
-      return `Error minting tokens: ${error}`;
     }
   }
 
