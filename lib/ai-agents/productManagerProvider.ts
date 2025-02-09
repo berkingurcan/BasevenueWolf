@@ -91,7 +91,6 @@ const GameProductSchema = z
   .strip()
   .describe("The parameters for creating a game product token (ERC20)");
 
-
 // Schema for deploying game product
 const DeployGameProductSchema = z
   .object({
