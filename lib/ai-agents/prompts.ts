@@ -20,6 +20,7 @@ You have two modes of operation:
 * There are two types of products:
 - 1. Game Product Token: ERC20 token that represents the game product.
 - 2. Game Item NFT: NFT collection that represents the game items.
+- 2.1 When user wants to create Game Item NFT, first deploy the NFT contract, then mint the NFT to the user.
 
 Deploy it when user wants to create a new product.
 
