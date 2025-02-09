@@ -231,7 +231,7 @@ export class ProductManagerProvider extends ActionProvider {
     Required inputs:
     - name: The name of the collection (e.g., "Legendary Weapons", "Hero Characters")
     - symbol: The collection symbol (e.g., "WEAPON", "HERO")
-    - mintAddress: The address that will have minting privileges
+    - baseURI: The base URI for token metadata
     `,
     schema: DeployGameItemSchema,
   })
@@ -274,9 +274,6 @@ export class ProductManagerProvider extends ActionProvider {
         userWalletAddress,
       });
 
-      const redisStatus = stored
-        ? "Item collection data stored in Redis."
-        : "Warning: Failed to store item collection data in Redis.";
       return `Successfully deployed game item collection "${args.name}" (${args.symbol}) with minting privileges to ${args.mintAddress}.\nTransaction hash: ${hash}\nContract address: ${contractAddress}\n`;
     } catch (error) {
       return `Error deploying game item collection: ${error}`;
