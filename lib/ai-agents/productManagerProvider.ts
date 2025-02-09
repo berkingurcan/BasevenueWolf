@@ -99,8 +99,7 @@ const GameItemSchema = z
     description: z.string().describe("Description of the game item"),
     contractAddress: z.string().describe("The ERC721 token contract address"),
     recipient: z.string().describe("The address to receive the minted NFT"),
-    tokenId: z.string().describe("The token ID for the NFT"),
-    tokenURI: z.string().optional().describe("The URI for the token metadata"),
+    tokenURI: z.string().describe("The URI for the token metadata"),
   })
   .strip()
   .describe("The parameters for creating a game item NFT (ERC721)");
@@ -215,6 +214,10 @@ export class ProductManagerProvider extends ActionProvider {
 
   /**
    * Deploys a new game item collection contract (NFT)
+   * 
+   * @param walletProvider - The wallet provider
+   * @param args - The arguments for deploying the game item collection
+   * @returns A string indicating the success or failure of the operation
    */
   @CreateAction({
     name: "deploy_game_item_collection",
@@ -282,6 +285,10 @@ export class ProductManagerProvider extends ActionProvider {
 
   /**
    * Creates and mints game product using ERC20 tokens
+   * 
+   * @param walletProvider - The wallet provider
+   * @param args - The arguments for creating the game product
+   * @returns A string indicating the success or failure of the operation
    */
   @CreateAction({
     name: "create_game_product",
@@ -342,6 +349,10 @@ export class ProductManagerProvider extends ActionProvider {
 
   /**
    * Creates and mints game items using ERC721 NFTs
+   * 
+   * @param walletProvider - The wallet provider
+   * @param args - The arguments for creating the game item
+   * @returns A string indicating the success or failure of the operation
    */
   @CreateAction({
     name: "create_game_item",
@@ -361,7 +372,7 @@ export class ProductManagerProvider extends ActionProvider {
     - description: Item description
     - contractAddress: The deployed ERC721 contract address
     - recipient: Address to receive the minted NFT
-    - tokenId: Unique identifier for the NFT
+    - tokenURI: The URI for the token metadata
     `,
     schema: GameItemSchema,
   })
@@ -389,13 +400,16 @@ export class ProductManagerProvider extends ActionProvider {
         data: encodeFunctionData({
           abi: mintNftAbi,
           functionName: "mint",
-          args: [`0x${args.recipient.replace("0x", "")}`, args.tokenURI || ""],
+          args: [`0x${args.recipient.replace("0x", "")}`, args.tokenURI],
         }),
       });
 
-      await walletProvider.waitForTransactionReceipt(hash);
+      const receipt = await walletProvider.waitForTransactionReceipt(hash);
+      
+      // Get the tokenId from the event logs
+      const tokenId = receipt.logs[0].topics[3]; // The tokenId is typically in the Transfer event
 
-      return `Successfully created and minted NFT ${args.name} (${args.symbol}) with ID ${args.tokenId} to ${args.recipient}.\nTransaction hash: ${hash}`;
+      return `Successfully created and minted NFT ${args.name} (${args.symbol}) with ID ${tokenId} to ${args.recipient}.\nTransaction hash: ${hash}`;
     } catch (error) {
       return `Error creating game item: ${error}`;
     }
