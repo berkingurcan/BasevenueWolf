@@ -1,15 +1,35 @@
-# BASEVENUEWOLF
+
+![BasevenueWolf Cover Image](./basevenue_cover.jpeg)
+
+# BasevenueWolf
 
 `ETH Global Agentic 2025`
 
-🚀 BasevenueWolf is the blockchain and AI-powered alternative to RevenueCat, bringing seamless, transparent, and trustless product management and revenue analytics to Web3 Applications.
+🚀 BasevenueWolf is the blockchain and AI-powered alternative to [RevenueCat](https://www.revenuecat.com/), bringing seamless, transparent, and trustless product management and revenue analytics to Web3 Applications.
+
+## Repositories
+
+- [Backend & Contracts](https://github.com/berkingurcan/BasevenueWolf)
+- [Frontend](https://github.com/batuhanozcan1605/basevenue_wolf)
+- [SDK](https://github.com/batuhanozcan1605/basevenuewolf_sdk)
+
+### Team Members
+
+- [Berkin Gürcan](https://github.com/berkingurcan)
+- [Batuhan Özcan](https://github.com/batuhanozcan1605)
 
 ## Features
 
-- 🤖 AI-powered Game Currency and Game products management
-- 💰 Revenue analytics and tracking(TODO)
-- ⛓️ Cross-chain bridging support(TODO)
-- 📊 Real-time analytics dashboard(TODO)
+- 🤖 AI-powered Game Currency and Game Products management
+- 👝 AI Supported Wallet Management (Future Development Idea)
+- 💰 Revenue analytics and tracking(Future Development Idea)
+- ⛓️ Cross-chain bridging support(Future Development Idea)
+- 📊 Real-time analytics dashboard(Future Development Idea)
+
+## Current Architecture
+
+![BasevenueWolf Architecture](./basevenuewolf_architecture.png)
+
 
 ## Installation
 
