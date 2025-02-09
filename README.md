@@ -126,9 +126,6 @@ npx hardhat run scripts/deploy-game-product.ts --network custom
 npx hardhat run scripts/deploy-game-item.ts --network custom
 ```
 
-
-```
-
 After deployment, the script will output the addresses of the deployed contracts. Make sure to save these addresses for future reference.
 
 ## API Documentation
